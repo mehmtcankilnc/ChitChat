@@ -1,0 +1,24 @@
+@"
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Build çıktıları
+bin/
+obj/
+[Bb]uild/
+[Ll]og/
+[Bb]enchmarkDotNet.Artifacts/
+
+# Paket klasörleri
+packages/
+**/node_modules/
+
+# OS dosyaları
+.DS_Store
+Thumbs.db
+
+# Yerel ayarlar
+appsettings.*.local.json
+"@ | Set-Content -Encoding UTF8 .gitignore

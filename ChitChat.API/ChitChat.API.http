@@ -1,0 +1,6 @@
+@ChitChat.API_HostAddress = http://localhost:5049
+
+GET {{ChitChat.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
