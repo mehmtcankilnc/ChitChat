@@ -26,7 +26,7 @@ public sealed class RegisterUserCommandHandler : ICommandHandler<RegisterUserCom
         if (await _userRepository.ExistsByEmailAsync(command.Email, cancellationToken) ||
             await _userRepository.ExistsByUsernameAsync(command.Username, cancellationToken))
         {
-            throw new EmailOrUsernameInUseException("Email or username is already in use!");
+            throw new EmailOrUsernameInUseException("Eposta veya kullanıcı zaten kullanımda!");
         }
 
         var passwordHash = _passwordHasher.Hash(command.Password);

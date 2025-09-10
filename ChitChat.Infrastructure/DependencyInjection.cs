@@ -6,6 +6,7 @@ using ChitChat.Application.Users.LoginUser;
 using ChitChat.Application.Users.RegisterUser;
 using ChitChat.Infrastructure.Messaging;
 using ChitChat.Infrastructure.Services;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ChitChat.Infrastructure;
@@ -21,6 +22,8 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
+        services.AddValidatorsFromAssemblies(
+            [typeof(RegisterUserCommand).Assembly, typeof(LoginUserCommand).Assembly]);
 
         return services;
     }

@@ -22,7 +22,7 @@ public sealed class LoginUserCommandHandler : ICommandHandler<LoginUserCommand, 
         var user = await _userRepository.GetByEmailAsync(command.Email, cancellationToken);
 
         if (user == null || !_passwordHasher.Verify(command.Password, user.PasswordHash))
-            throw new InvalidCredentialsException("Invalid email or password.");
+            throw new InvalidCredentialsException("Geçersiz eposta veya şifre!");
 
         return user.UserId;
     }

@@ -21,6 +21,7 @@ public class ExceptionHandlingMiddleware(RequestDelegate next)
                 NotFoundException => StatusCodes.Status404NotFound,
                 EmailOrUsernameInUseException => StatusCodes.Status409Conflict,
                 InvalidCredentialsException => StatusCodes.Status401Unauthorized,
+                ValidationException => StatusCodes.Status400BadRequest,
                 _ => StatusCodes.Status500InternalServerError
             };
 
