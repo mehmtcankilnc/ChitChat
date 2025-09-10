@@ -2,6 +2,7 @@
 using ChitChat.Application.Abstractions.Messaging;
 using ChitChat.Application.Abstractions.Persistence;
 using ChitChat.Application.Abstractions.Security;
+using ChitChat.Application.Exceptions;
 using ChitChat.Domain.Entities;
 
 namespace ChitChat.Application.Users.RegisterUser;
@@ -25,7 +26,7 @@ public sealed class RegisterUserCommandHandler : ICommandHandler<RegisterUserCom
         if (await _userRepository.ExistsByEmailAsync(command.Email, cancellationToken) ||
             await _userRepository.ExistsByUsernameAsync(command.Username, cancellationToken))
         {
-            throw new Exception("Email or username is already in use!");
+            throw new EmailOrUsernameInUseException("Email or username is already in use!");
         }
 
         var passwordHash = _passwordHasher.Hash(command.Password);
@@ -41,7 +42,5 @@ public sealed class RegisterUserCommandHandler : ICommandHandler<RegisterUserCom
 
         await _userRepository.AddAsync(user, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-        return;
     }
 }

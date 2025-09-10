@@ -1,4 +1,6 @@
 ﻿
+using ChitChat.Application.Abstractions.Messaging;
+using ChitChat.Application.Users.LoginUser;
 using ChitChat.Application.Users.RegisterUser;
 using ChitChat.Domain.Entities;
 using ChitChat.Infrastructure;
@@ -12,20 +14,27 @@ namespace ChitChat.API.Controllers;
 [ApiController]
 public class AuthController : ControllerBase
 {
-    private readonly RegisterUserCommandHandler _handler;
+    private readonly ICommandDispatcher _commands;
     private readonly AppDbContext _dbContext;
 
-    public AuthController(RegisterUserCommandHandler handler, AppDbContext dbContext)
+    public AuthController(ICommandDispatcher commands, AppDbContext dbContext)
     {
-        _handler = handler;
+        _commands = commands;
         _dbContext = dbContext;
     }
 
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterUserCommand cmd, CancellationToken ct)
     {
-        await _handler.Handle(cmd, ct);
+        await _commands.Send(cmd, ct);
         return NoContent();
+    }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(LoginUserCommand cmd, CancellationToken ct)
+    {
+        Guid userId = await _commands.Send<LoginUserCommand, Guid>(cmd, ct);
+        return Ok(userId);
     }
 
     [HttpGet]

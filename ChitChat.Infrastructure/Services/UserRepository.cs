@@ -20,12 +20,17 @@ public sealed class UserRepository : IUserRepository
     }
 
     public Task<bool> ExistsByEmailAsync(string email, CancellationToken ct = default) =>
-    _appDbContext.Users
-        .AsNoTracking()
-        .AnyAsync(u => u.Email == email, ct);
+        _appDbContext.Users
+            .AsNoTracking()
+            .AnyAsync(u => u.Email == email, ct);
 
     public Task<bool> ExistsByUsernameAsync(string username, CancellationToken ct = default) =>
         _appDbContext.Users
             .AsNoTracking()
             .AnyAsync(u => u.Username == username, ct);
+
+    public Task<User?> GetByEmailAsync(string email, CancellationToken ct = default) =>
+        _appDbContext.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Email == email, ct);
 }

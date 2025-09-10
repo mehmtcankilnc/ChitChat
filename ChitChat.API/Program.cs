@@ -1,3 +1,4 @@
+using ChitChat.API.Middlewares;
 using ChitChat.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,6 +24,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 
