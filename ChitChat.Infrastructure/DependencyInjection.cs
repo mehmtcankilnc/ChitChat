@@ -2,11 +2,17 @@
 using ChitChat.Application.Abstractions.Messaging;
 using ChitChat.Application.Abstractions.Persistence;
 using ChitChat.Application.Abstractions.Security;
+using ChitChat.Application.Messages.GetMessages;
+using ChitChat.Application.Messages.SendMessage;
 using ChitChat.Application.Users.LoginUser;
 using ChitChat.Application.Users.RegisterUser;
+using ChitChat.Domain.Entities;
+using ChitChat.Domain.Models;
 using ChitChat.Infrastructure.Messaging;
 using ChitChat.Infrastructure.Services;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ChitChat.Infrastructure;
@@ -16,12 +22,16 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
         services.AddScoped<ICommandHandler<RegisterUserCommand>, RegisterUserCommandHandler>();
-        services.AddScoped<ICommandHandler<LoginUserCommand, Guid>, LoginUserCommandHandler>();
+        services.AddScoped<ICommandHandler<LoginUserCommand, UserLoginResponse>, LoginUserCommandHandler>();
+        services.AddScoped<ICommandHandler<SendMessageCommand, Message>, SendMessageCommandHandler>();
+        services.AddScoped<ICommandHandler<GetMessagesCommand, List<Message>>, GetMessagesCommandHandler>();
         services.AddScoped<ICommandDispatcher, CommandDispatcher>();
         services.AddScoped<IQueryDispatcher, QueryDispatcher>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IMessageRepository, MessageRepository>();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
+        services.AddScoped<ITokenService, TokenService>();
         services.AddValidatorsFromAssemblies(
             [typeof(RegisterUserCommand).Assembly, typeof(LoginUserCommand).Assembly]);
 

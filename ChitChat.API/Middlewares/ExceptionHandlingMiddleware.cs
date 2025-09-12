@@ -22,6 +22,7 @@ public class ExceptionHandlingMiddleware(RequestDelegate next)
                 EmailOrUsernameInUseException => StatusCodes.Status409Conflict,
                 InvalidCredentialsException => StatusCodes.Status401Unauthorized,
                 ValidationException => StatusCodes.Status400BadRequest,
+                UnauthorizedException => StatusCodes.Status401Unauthorized,
                 _ => StatusCodes.Status500InternalServerError
             };
 

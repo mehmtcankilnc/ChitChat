@@ -3,9 +3,12 @@ using ChitChat.Application.Abstractions.Messaging;
 using ChitChat.Application.Users.LoginUser;
 using ChitChat.Application.Users.RegisterUser;
 using ChitChat.Domain.Entities;
+using ChitChat.Domain.Models;
 using ChitChat.Infrastructure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChitChat.API.Controllers;
@@ -23,8 +26,9 @@ public class AuthController : ControllerBase
         _dbContext = dbContext;
     }
 
+    [EnableRateLimiting("fixed")]
     [HttpPost("register")]
-    public async Task<IActionResult> Register(RegisterUserCommand cmd, CancellationToken ct)
+    public async Task<IActionResult> Register([FromBody] RegisterUserCommand cmd, CancellationToken ct)
     {
         await _commands.Send(cmd, ct);
         return NoContent();
@@ -33,11 +37,11 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginUserCommand cmd, CancellationToken ct)
     {
-        Guid userId = await _commands.Send<LoginUserCommand, Guid>(cmd, ct);
-        return Ok(userId);
+        return Ok(await _commands.Send<LoginUserCommand, UserLoginResponse>(cmd, ct));
     }
 
     [HttpGet]
+    [Authorize]
     public async Task<List<User>> GetUsers()
     {
         return await _dbContext.Users.ToListAsync();

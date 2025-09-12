@@ -1,24 +1,31 @@
+using AspNetCoreRateLimit;
+using ChitChat.API.Extensions;
+using ChitChat.API.Hubs;
 using ChitChat.API.Middlewares;
 using ChitChat.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>(opt =>
-    opt.UseInMemoryDatabase("users")
-);
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
 builder.Services.AddInfrastructure();
+
+builder.Services.ConfigureAuthentication(builder.Configuration);
+builder.Services.AddAuthorization();
+
+builder.Services.AddMemoryCache();
+builder.Services.ConfigureRateLimiting();
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -29,8 +36,12 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
+app.UseIpRateLimiting();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<MessageHub>("/message-hub");
 
 app.Run();
