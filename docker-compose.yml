@@ -1,0 +1,36 @@
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: chitchat-mssql
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Mehmtcan.101217
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P $$MSSQL_SA_PASSWORD -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: ChitChat.API/Dockerfile
+    container_name: chitchat-api
+    depends_on:
+      mssql:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
+      ConnectionStrings__SqlServer: "Server=chitchat-mssql,1433;Database=ChitChat;User Id=sa;Password=Mehmtcan.101217;TrustServerCertificate=True;"
+      Jwt__Issuer: "AudienceInformation"
+      Jwt__Audience: "IssuerInformation"
+      Jwt__Key: "JWTAuthenticationHIGHsecuredPasswordVVVp1OH7Xzyrfm101217"
+    ports:
+      - "8080:8080"
+
+volumes:
+  mssql-data:
